@@ -7,13 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { getConnection } from '@/api/subscription'
-import { useToast } from '@/hooks/useToast'
-import { Copy, Check, QrCode, X } from 'lucide-react'
+import { ExternalLink, QrCode, X } from 'lucide-react'
 
 export function ConnectionLinkCard() {
   const { t } = useTranslation()
-  const toast = useToast()
-  const [copied, setCopied] = useState(false)
   const [qrOpen, setQrOpen] = useState(false)
 
   const { data: connection, isLoading, refetch } = useQuery({
@@ -22,14 +19,6 @@ export function ConnectionLinkCard() {
   })
 
   const link = connection?.link ?? ''
-
-  const handleCopy = async () => {
-    if (!link) return
-    await navigator.clipboard.writeText(link)
-    setCopied(true)
-    toast.success(t('copied'))
-    setTimeout(() => setCopied(false), 2000)
-  }
 
   return (
     <Card>
@@ -46,21 +35,16 @@ export function ConnectionLinkCard() {
         {isLoading ? (
           <div className="h-12 animate-pulse rounded-[var(--radius)] bg-[hsl(var(--muted))]" />
         ) : link ? (
-          <>
-            <code className="block w-full break-all rounded-[var(--radius)] bg-[hsl(var(--muted))] p-3 font-mono text-xs leading-relaxed text-[hsl(var(--foreground))]">
-              {link}
-            </code>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={handleCopy}>
-                {copied ? <Check size={16} /> : <Copy size={16} />}
-                {t('dashboard_connect_copy')}
-              </Button>
-              <Button variant="outline" onClick={() => setQrOpen(true)}>
-                <QrCode size={16} />
-                {t('dashboard_connect_qr')}
-              </Button>
-            </div>
-          </>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => window.location.assign(link)}>
+              <ExternalLink size={16} />
+              {t('dashboard_connect_button')}
+            </Button>
+            <Button variant="outline" onClick={() => setQrOpen(true)}>
+              <QrCode size={16} />
+              {t('dashboard_connect_qr')}
+            </Button>
+          </div>
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-[hsl(var(--muted-foreground))]">{t('dashboard_connect_empty')}</p>
