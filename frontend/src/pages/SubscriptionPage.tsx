@@ -28,7 +28,7 @@ import {
   type Entitlements,
 } from '@/api/subscription'
 import { createPayment, type PromoApplyResponse } from '@/api/payment'
-import { Copy, Check, RefreshCw, ArrowRight, Repeat2 } from 'lucide-react'
+import { ExternalLink, RefreshCw, ArrowRight, Repeat2 } from 'lucide-react'
 import { apiRequest } from '@/api/client'
 import { useToast } from '@/hooks/useToast'
 
@@ -68,8 +68,6 @@ export function SubscriptionPage() {
   const { t, i18n } = useTranslation()
   const isRu = i18n.language === 'ru'
   const toast = useToast()
-
-  const [copied, setCopied] = useState(false)
 
   // Legacy flow state
   const [selectedMonths, setSelectedMonths] = useState<number | null>(null)
@@ -230,14 +228,6 @@ export function SubscriptionPage() {
     },
   })
 
-  const handleCopy = async () => {
-    if (!connection?.link) return
-    await navigator.clipboard.writeText(connection.link)
-    setCopied(true)
-    toast.success(t('copied'))
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   const handleSelectStandalonePlan = (plan: PubPlan) => {
     setSelectedPlan(plan)
     setSelectedOption(null)
@@ -348,14 +338,10 @@ export function SubscriptionPage() {
                 {connLoading ? (
                   <div className="h-10 bg-[hsl(var(--muted))] rounded animate-pulse" />
                 ) : connection ? (
-                  <div className="flex gap-2">
-                    <code className="flex-1 font-mono text-xs bg-[hsl(var(--muted))] rounded-lg p-3 break-all">
-                      {connection.link}
-                    </code>
-                    <Button size="sm" variant="outline" onClick={handleCopy} className="shrink-0">
-                      {copied ? <Check size={16} /> : <Copy size={16} />}
-                    </Button>
-                  </div>
+                  <Button onClick={() => window.location.assign(connection.link)}>
+                    <ExternalLink size={16} />
+                    {t('dashboard_connect_button')}
+                  </Button>
                 ) : (
                   <Button variant="outline" size="sm" onClick={() => refetchConn()}>
                     <RefreshCw size={14} className="mr-2" />
