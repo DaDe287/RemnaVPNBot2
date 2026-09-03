@@ -31,6 +31,7 @@ import { createPayment, type PromoApplyResponse } from '@/api/payment'
 import { ExternalLink, RefreshCw, ArrowRight, Repeat2 } from 'lucide-react'
 import { apiRequest } from '@/api/client'
 import { useToast } from '@/hooks/useToast'
+import { reachMetrikaGoal } from '@/lib/metrika'
 
 function useAvailableProviders() {
   return useQuery({
@@ -227,6 +228,11 @@ export function SubscriptionPage() {
       toast.error(msg)
     },
   })
+
+  const handlePayment = () => {
+    reachMetrikaGoal('PURCH')
+    paymentMutation.mutate()
+  }
 
   const handleSelectStandalonePlan = (plan: PubPlan) => {
     setSelectedPlan(plan)
@@ -492,7 +498,7 @@ export function SubscriptionPage() {
                   )}
                   <Button
                     className="w-full h-11 font-bold text-base"
-                    onClick={() => paymentMutation.mutate()}
+                    onClick={handlePayment}
                     disabled={
                       paymentMutation.isPending ||
                       !selectedProvider ||
@@ -587,7 +593,7 @@ export function SubscriptionPage() {
                   )}
                   <Button
                     className="w-full h-11 font-bold text-base"
-                    onClick={() => paymentMutation.mutate()}
+                    onClick={handlePayment}
                     disabled={
                       paymentMutation.isPending ||
                       !selectedProvider ||
