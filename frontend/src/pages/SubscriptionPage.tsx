@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { AppShell } from '@/components/layout/AppShell'
 import { SubscriptionCard } from '@/components/subscription/SubscriptionCard'
+import { ConnectionButtons } from '@/components/subscription/ConnectionButtons'
 import { TrialBanner } from '@/components/subscription/TrialBanner'
 import { PlanSelector } from '@/components/subscription/PlanSelector'
 import { TariffSelector } from '@/components/subscription/TariffSelector'
@@ -28,7 +29,7 @@ import {
   type Entitlements,
 } from '@/api/subscription'
 import { createPayment, type PromoApplyResponse } from '@/api/payment'
-import { ExternalLink, RefreshCw, ArrowRight, Repeat2 } from 'lucide-react'
+import { RefreshCw, ArrowRight, Repeat2 } from 'lucide-react'
 import { apiRequest } from '@/api/client'
 import { useToast } from '@/hooks/useToast'
 import { reachMetrikaGoal } from '@/lib/metrika'
@@ -343,11 +344,10 @@ export function SubscriptionPage() {
               <CardContent className="space-y-3">
                 {connLoading ? (
                   <div className="h-10 bg-[hsl(var(--muted))] rounded animate-pulse" />
-                ) : connection ? (
-                  <Button onClick={() => window.location.assign(connection.link)}>
-                    <ExternalLink size={16} />
-                    {t('dashboard_connect_button')}
-                  </Button>
+                ) : connection?.link ? (
+                  <div className="flex flex-col items-start gap-2">
+                    <ConnectionButtons link={connection.link} />
+                  </div>
                 ) : (
                   <Button variant="outline" size="sm" onClick={() => refetchConn()}>
                     <RefreshCw size={14} className="mr-2" />

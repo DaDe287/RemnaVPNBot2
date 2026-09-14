@@ -3,11 +3,12 @@ import { createPortal } from 'react-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { QRCodeSVG } from 'qrcode.react'
+import { ConnectionButtons } from '@/components/subscription/ConnectionButtons'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { getConnection } from '@/api/subscription'
-import { ExternalLink, QrCode, X } from 'lucide-react'
+import { QrCode, X } from 'lucide-react'
 
 export function ConnectionLinkCard() {
   const { t } = useTranslation()
@@ -19,8 +20,6 @@ export function ConnectionLinkCard() {
   })
 
   const link = connection?.link ?? ''
-  const incyLink = `https://bot.oberegvpn.org/incy?url=${encodeURIComponent(`incy://import/${link}`)}`
-  const happLink = `https://bot.oberegvpn.org/happ?url=${encodeURIComponent(`happ://import/${link}`)}`
 
   return (
     <Card>
@@ -38,14 +37,7 @@ export function ConnectionLinkCard() {
           <div className="h-12 animate-pulse rounded-[var(--radius)] bg-[hsl(var(--muted))]" />
         ) : link ? (
           <div className="flex flex-col items-start gap-2">
-            <Button onClick={() => window.location.assign(incyLink)}>
-              <ExternalLink size={16} />
-              {t('dashboard_connect_incy')}
-            </Button>
-            <Button variant="secondary" onClick={() => window.location.assign(happLink)}>
-              <ExternalLink size={16} />
-              {t('dashboard_connect_happ')}
-            </Button>
+            <ConnectionButtons link={link} />
             <Button variant="outline" onClick={() => setQrOpen(true)}>
               <QrCode size={16} />
               {t('dashboard_connect_qr')}

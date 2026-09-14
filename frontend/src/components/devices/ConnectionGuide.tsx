@@ -84,7 +84,7 @@ export function ConnectionGuide({ config }: { config: AppConfig }) {
       <a
         key={idx}
         href={href}
-        target={isDeepLink ? undefined : '_blank'}
+        target="_blank"
         rel="noopener noreferrer"
         className={buttonVariants({ variant: isDeepLink ? 'default' : 'soft', size: 'sm' })}
       >
