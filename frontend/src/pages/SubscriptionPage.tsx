@@ -345,9 +345,7 @@ export function SubscriptionPage() {
                 {connLoading ? (
                   <div className="h-10 bg-[hsl(var(--muted))] rounded animate-pulse" />
                 ) : connection?.link ? (
-                  <div className="flex flex-col items-start gap-2">
-                    <ConnectionButtons link={connection.link} />
-                  </div>
+                  <ConnectionButtons link={connection.link} />
                 ) : (
                   <Button variant="outline" size="sm" onClick={() => refetchConn()}>
                     <RefreshCw size={14} className="mr-2" />
