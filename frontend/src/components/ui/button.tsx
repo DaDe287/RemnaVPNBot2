@@ -9,6 +9,8 @@ const buttonVariants = cva(
       variant: {
         default:
           'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-[var(--shadow-xs)] hover:bg-[var(--primary-press)]',
+        secondary:
+          'bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))] shadow-[var(--shadow-xs)] hover:bg-[color-mix(in_srgb,hsl(var(--secondary))_82%,black)]',
         outline:
           'border-[hsl(var(--border))] bg-transparent text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]',
         ghost:

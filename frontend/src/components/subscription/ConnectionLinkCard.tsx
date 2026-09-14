@@ -19,6 +19,8 @@ export function ConnectionLinkCard() {
   })
 
   const link = connection?.link ?? ''
+  const incyLink = `https://bot.oberegvpn.org/incy?url=${encodeURIComponent(`incy://import/${link}`)}`
+  const happLink = `https://bot.oberegvpn.org/happ?url=${encodeURIComponent(`happ://import/${link}`)}`
 
   return (
     <Card>
@@ -35,10 +37,14 @@ export function ConnectionLinkCard() {
         {isLoading ? (
           <div className="h-12 animate-pulse rounded-[var(--radius)] bg-[hsl(var(--muted))]" />
         ) : link ? (
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => window.location.assign(link)}>
+          <div className="flex flex-col items-start gap-2">
+            <Button onClick={() => window.location.assign(incyLink)}>
               <ExternalLink size={16} />
-              {t('dashboard_connect_button')}
+              {t('dashboard_connect_incy')}
+            </Button>
+            <Button variant="secondary" onClick={() => window.location.assign(happLink)}>
+              <ExternalLink size={16} />
+              {t('dashboard_connect_happ')}
             </Button>
             <Button variant="outline" onClick={() => setQrOpen(true)}>
               <QrCode size={16} />
