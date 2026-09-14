@@ -9,29 +9,31 @@ export function ConnectionButtons({ link }: { link: string }) {
   const { t } = useTranslation()
   const [qrOpen, setQrOpen] = useState(false)
   const incyLink = `https://bot.oberegvpn.org/incy?url=${encodeURIComponent(`incy://import/${link}`)}`
-  const happLink = `https://bot.oberegvpn.org/happ?url=${encodeURIComponent(`happ://import/${link}`)}`
+  const happLink = `https://bot.oberegvpn.org/happ?url=${encodeURIComponent(`happ://add/${link}`)}`
 
   return (
     <>
-      <div className="flex items-center gap-2 overflow-x-auto py-1">
-        <a
-          href={incyLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: 'default', className: 'shrink-0' })}
-        >
-          <ExternalLink size={16} />
-          {t('dashboard_connect_incy')}
-        </a>
-        <a
-          href={happLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: 'outline', className: 'shrink-0' })}
-        >
-          <ExternalLink size={16} />
-          {t('dashboard_connect_happ')}
-        </a>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 overflow-x-auto py-1">
+          <a
+            href={incyLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ variant: 'default', className: 'shrink-0' })}
+          >
+            <ExternalLink size={16} />
+            {t('dashboard_connect_incy')}
+          </a>
+          <a
+            href={happLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ variant: 'outline', className: 'shrink-0' })}
+          >
+            <ExternalLink size={16} />
+            {t('dashboard_connect_happ')}
+          </a>
+        </div>
         <Button variant="outline" className="shrink-0" onClick={() => setQrOpen(true)}>
           <QrCode size={16} />
           {t('dashboard_connect_qr')}
