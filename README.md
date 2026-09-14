@@ -541,7 +541,7 @@ MIN_PRORATED_PRICE_STARS=
 | `PANEL_WEBHOOK_SECRET` | Секрет для проверки вебхуков |
 | `USER_SQUAD_UUIDS` | Список UUID Internal Squads для новых пользователей, значения через запятую (`uuid1,uuid2`) |
 | `USER_EXTERNAL_SQUAD_UUID` | UUID External Squad (опционально) |
-| `USER_TRAFFIC_LIMIT_GB` | Лимит трафика (0 = безлимит) |
+| `USER_TRAFFIC_LIMIT_GB` | Устаревший лимит legacy-потока. Для тарифов каталога не используется: лимит задаётся в ГБ у опции тарифа в админке. |
 | `USER_HWID_DEVICE_LIMIT` | Дефолтный лимит устройств HWID для платных тарифов (0 = безлимит). В админке у каждого тарифа можно задать свой лимит, который хранится в БД и переопределяет это значение. |
 | `SUBSCRIPTION_PAGE_CONFIG_UUID` | UUID Subscription Page для вкладок «Устройства»/«Инструкция» (пусто = конфиг «Default» из панели) |
 | `SUBSCRIPTION_PAGE_CONFIG_PATH` | Опциональный офлайн-override: путь к смонтированному `app-config-v2.json` (приоритет над панелью) |

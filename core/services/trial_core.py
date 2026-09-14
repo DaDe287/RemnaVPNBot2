@@ -1,13 +1,13 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from typing import Any, Optional, Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.settings import Settings
 from db.models import Account, User
-from core.dal import account_dal, subscription_dal, trial_activation_dal, user_dal
+from core.dal import account_dal, pricing_plan_dal, subscription_dal, trial_activation_dal, user_dal
 from core.services.panel_client import PanelApiService
 
 
@@ -30,6 +30,35 @@ def _panel_datetime(value: datetime) -> str:
 
 def _description_from_user(user: User) -> str:
     return "\n".join([user.username or "", user.first_name or "", user.last_name or ""])
+
+
+def _plan_squad_uuids(plan: Any) -> list[str]:
+    """Return every configured squad while retaining legacy single-squad support."""
+    configured = getattr(plan, "remnawave_squad_uuids", None)
+    if isinstance(configured, str):
+        values = configured.split(",")
+    else:
+        values = configured or [getattr(plan, "remnawave_squad_uuid", None)]
+    squads: list[str] = []
+    for value in values:
+        squad_uuid = str(value).strip() if value else ""
+        if squad_uuid and squad_uuid not in squads:
+            squads.append(squad_uuid)
+    return squads
+
+
+async def _resolve_trial_squad_uuids(
+    session: AsyncSession,
+    settings: Settings,
+) -> Optional[list[str]]:
+    """Prefer squads configured for the trial tariff over legacy env settings."""
+    plans = await pricing_plan_dal.get_plans(session)
+    trial_plan = next((plan for plan in plans if plan.is_trial), None)
+    if trial_plan is not None:
+        squads = _plan_squad_uuids(trial_plan)
+        if squads:
+            return squads
+    return settings.parsed_user_squad_uuids
 
 
 async def resolve_trial_identity(
@@ -128,6 +157,7 @@ async def _get_or_create_panel_user_link_details(
     panel: PanelApiService,
     user_id: int,
     db_user: User,
+    squad_uuids: Optional[Sequence[str]] = None,
 ) -> tuple[Optional[str], Optional[str], Optional[str]]:
     current_panel_uuid = db_user.panel_user_uuid
     is_site_user = user_id < 0
@@ -173,7 +203,7 @@ async def _get_or_create_panel_user_link_details(
             telegram_id=None if is_site_user else user_id,
             email=site_email if is_site_user else None,
             description=_description_from_user(db_user),
-            specific_squad_uuids=settings.parsed_user_squad_uuids,
+            specific_squad_uuids=list(squad_uuids) if squad_uuids else None,
             external_squad_uuid=settings.parsed_user_external_squad_uuid,
             default_traffic_limit_bytes=settings.user_traffic_limit_bytes,
             default_traffic_limit_strategy=settings.USER_TRAFFIC_STRATEGY,
@@ -219,6 +249,7 @@ def _build_panel_update_payload(
     traffic_limit_bytes: int,
     description: str,
     telegram_user_id: Optional[int] = None,
+    squad_uuids: Optional[Sequence[str]] = None,
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "uuid": panel_user_uuid,
@@ -234,8 +265,8 @@ def _build_panel_update_payload(
 
     if telegram_user_id is not None:
         payload["telegramId"] = telegram_user_id
-    if settings.parsed_user_squad_uuids:
-        payload["activeInternalSquads"] = settings.parsed_user_squad_uuids
+    if squad_uuids:
+        payload["activeInternalSquads"] = list(squad_uuids)
     if settings.parsed_user_external_squad_uuid:
         payload["externalSquadUuid"] = settings.parsed_user_external_squad_uuid
     return payload
@@ -258,12 +289,14 @@ async def _activate_trial_for_user_id(
 
     panel = PanelApiService(settings)
     try:
+        squad_uuids = await _resolve_trial_squad_uuids(session, settings)
         panel_user_uuid, panel_sub_uuid, panel_short_uuid = await _get_or_create_panel_user_link_details(
             session,
             settings,
             panel,
             user_id,
             db_user,
+            squad_uuids,
         )
         if not panel_user_uuid or not panel_sub_uuid:
             return {
@@ -321,6 +354,7 @@ async def _activate_trial_for_user_id(
                 traffic_limit_bytes=traffic_limit_bytes,
                 description=_description_from_user(db_user),
                 telegram_user_id=telegram_user_id if user_id > 0 else None,
+                squad_uuids=squad_uuids,
             ),
         )
         if not updated_panel_user or updated_panel_user.get("error"):

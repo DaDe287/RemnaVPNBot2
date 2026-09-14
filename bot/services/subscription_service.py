@@ -560,7 +560,9 @@ class SubscriptionService:
                 "duration_months": payment.duration_months or 0,
                 "is_active": bool(end_date and end_date > now),
                 "status_from_panel": "ACTIVE",
-                "traffic_limit_bytes": traffic_bytes or self.settings.user_traffic_limit_bytes,
+                # ``0`` is an explicit unlimited option in the catalog, not a
+                # request to use USER_TRAFFIC_LIMIT_GB from the environment.
+                "traffic_limit_bytes": traffic_bytes,
                 "provider": provider,
                 "skip_notifications": user_id < 0,
                 "auto_renew_enabled": False,

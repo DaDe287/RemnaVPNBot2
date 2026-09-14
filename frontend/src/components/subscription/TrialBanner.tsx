@@ -4,6 +4,7 @@ import { Gift, ArrowRight } from 'lucide-react'
 import { activateTrial, getTrialEligibility } from '@/api/subscription'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/useToast'
+import { reachMetrikaGoal } from '@/lib/metrika'
 
 export function TrialBanner() {
   const { t } = useTranslation()
@@ -30,6 +31,11 @@ export function TrialBanner() {
     },
   })
 
+  const handleActivate = () => {
+    reachMetrikaGoal('TRIAL')
+    trialMutation.mutate()
+  }
+
   if (!eligibility?.eligible) return null
 
   return (
@@ -52,7 +58,7 @@ export function TrialBanner() {
         </div>
         <Button
           className="w-full shrink-0 sm:w-auto"
-          onClick={() => trialMutation.mutate()}
+          onClick={handleActivate}
           isLoading={trialMutation.isPending}
         >
           {trialMutation.isPending ? t('trial_activating') : t('trial_activate')}
