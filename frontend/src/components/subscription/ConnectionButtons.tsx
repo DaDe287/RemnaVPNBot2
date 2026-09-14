@@ -2,14 +2,25 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import { useTranslation } from 'react-i18next'
-import { ExternalLink, QrCode, X } from 'lucide-react'
+import { Copy, ExternalLink, QrCode, X } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
+import { useToast } from '@/hooks/useToast'
 
 export function ConnectionButtons({ link }: { link: string }) {
   const { t } = useTranslation()
+  const toast = useToast()
   const [qrOpen, setQrOpen] = useState(false)
   const incyLink = `https://bot.oberegvpn.org/incy?url=${encodeURIComponent(`incy://import/${link}`)}`
   const happLink = `https://bot.oberegvpn.org/happ?url=${encodeURIComponent(`happ://add/${link}`)}`
+
+  async function copySubscription() {
+    try {
+      await navigator.clipboard.writeText(link)
+      toast.success(t('copied'))
+    } catch {
+      toast.error(t('dashboard_connect_copy_error'))
+    }
+  }
 
   return (
     <>
@@ -34,10 +45,21 @@ export function ConnectionButtons({ link }: { link: string }) {
             {t('dashboard_connect_happ')}
           </a>
         </div>
-        <Button variant="outline" className="shrink-0" onClick={() => setQrOpen(true)}>
-          <QrCode size={16} />
-          {t('dashboard_connect_qr')}
-        </Button>
+        <div className="flex items-center gap-2 overflow-x-auto py-1">
+          <Button variant="outline" className="shrink-0" onClick={() => setQrOpen(true)}>
+            <QrCode size={16} />
+            {t('dashboard_connect_qr')}
+          </Button>
+          <Button
+            variant="outline"
+            className="shrink-0"
+            title={t('dashboard_connect_copy_hint')}
+            onClick={copySubscription}
+          >
+            <Copy size={16} />
+            {t('dashboard_connect_copy')}
+          </Button>
+        </div>
       </div>
 
       {qrOpen &&
